@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from typing import Dict
+
+from pydantic import BaseModel, validator
 
 from . import db
 
@@ -6,10 +8,15 @@ from . import db
 class InputBody(BaseModel):
     questions_num: int
 
+    @validator('questions_num')
+    def validate_questions_num(cls, value):
+        assert value > 0, 'value must be greater then 0'
+        return value
+
 
 class ToJSONMixin:
 
-    def to_json(self):
+    def to_json(self) -> Dict[str, ...]:
         return {column.name: str(getattr(self, column.name)) for column in self.__table__.columns}
 
 
@@ -20,5 +27,5 @@ class QuizQuestion(db.Model, ToJSONMixin):
     answer = db.Column(db.String(5120), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
 
-    def __repr__(self):
-        return 'Question №%r' % self.id
+    def __repr__(self) -> str:
+        return 'Question №%r' % self.question_id

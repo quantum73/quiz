@@ -1,18 +1,12 @@
 import os
 import secrets
 
-from dotenv import dotenv_values
-
-env_config = dotenv_values(".env")
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
-    SECRET_KEY = env_config.get('SECRET_KEY', secrets.token_hex())
+    SECRET_KEY = secrets.token_hex()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    HOST = env_config.get('HOST', '127.0.0.1')
-    PORT = env_config.get('PORT', 5000)
     EXTERNAL_API_URL = 'https://jservice.io/api/random?count=1'
 
     @staticmethod
@@ -22,7 +16,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = env_config.get(
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DEV_DATABASE_URL',
         f"sqlite:///{os.path.join(basedir, 'data_dev.sqlite')}"
     )
@@ -30,7 +24,7 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = env_config.get(
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
         'TEST_DATABASE_URL',
         f"sqlite:///{os.path.join(basedir, 'data_test.sqlite')}"
     )
@@ -38,7 +32,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = env_config.get(
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
         f"sqlite:///{os.path.join(basedir, 'data_prod.sqlite')}"
     )

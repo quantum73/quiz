@@ -9,7 +9,6 @@ from config import basedir
 
 app = create_app(os.environ.get('FLASK_CONFIG', 'default'))
 manager = Manager(app)
-db.create_all(app=app)
 
 
 def make_shell_context():
@@ -17,6 +16,13 @@ def make_shell_context():
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
+
+
+@manager.command
+def create_db():
+    db.drop_all()
+    db.create_all()
+    db.session.commit()
 
 
 @manager.command
